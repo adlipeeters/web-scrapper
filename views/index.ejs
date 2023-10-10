@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= title %>
+    </title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+</head>
+
+<body>
+    <div class="flex justify-center py-20">
+        <div class="flex flex-col items-center">
+            <h2 class="text-3xl font-bold tracking-tight text-black sm:text-4xl text-center">Web Scraper</h2>
+            <div class="mt-6 flex max-w-md gap-x-4">
+                <form id="scrapingForm">
+                    <input id="urlInput" name="email" type="text" autocomplete="email" required
+                        class="min-w-0 flex-auto rounded-md border-2 bg-white/5 px-3.5 py-2 text-black shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6 w-[200px]"
+                        placeholder="https://wsa-test.vercel.app" value="https://wsa-test.vercel.app">
+                    <button type="submit"
+                        class="flex-none rounded-md bg-indigo-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">Scrape</button>
+                </form>
+            </div>
+            <div class="bg-white pt-20">
+                <div class="mx-auto px-6 lg:px-8">
+                    <div class="mx-auto flex flex-col gap-y-4 border-2 border-gray-300 rounded-lg p-6">
+                        <div id="resultData">NO DATA</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <h1>
+        </h1>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.js"></script>
+    <script>
+        document.getElementById('scrapingForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const url = document.getElementById('urlInput').value;
+
+            fetch('/scrapping', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ url })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        Toastify({
+                            text: data.error,
+                            className: "info",
+                            style: {
+                                background: "red",
+                            }
+                        }).showToast();
+                    } else {
+                        Toastify({
+                            text: "Success",
+                            className: "info",
+                            style: {
+                                background: "green",
+                            }
+                        }).showToast();
+                        const formattedData = data.map(obj => JSON.stringify(obj, null, 4)).join('\n\n');
+                        document.getElementById('resultData').innerText = formattedData;
+
+                    }
+                })
+                .catch(error => {
+                    // console.log(error)
+                    Toastify({
+                        text: "Failed to send request",
+                        className: "info",
+                        style: {
+                            background: "red",
+                        }
+                    }).showToast();
+                });
+        });
+    </script>
+</body>
+
+</html>
